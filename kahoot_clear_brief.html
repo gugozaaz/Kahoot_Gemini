@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kahoot! - C.L.E.A.R. Brief Analysis</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --kahoot-purple: #46178f;
+            --kahoot-blue: #1368ce;
+            --kahoot-red: #e21b3c;
+            --kahoot-yellow: #d89e00;
+            --kahoot-green: #26890c;
+            --bg-color: #f2f5f7;
+            --card-bg: #ffffff;
+            --text-main: #333333;
+        }
+        body {
+            font-family: 'Prompt', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            margin: 0;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        .header h1 {
+            color: var(--kahoot-purple);
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+        }
+        .header p {
+            font-size: 1.2rem;
+            color: #555;
+        }
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.05);
+            border-left: 8px solid var(--kahoot-purple);
+            transition: transform 0.2s ease;
+        }
+        .card:hover {
+            transform: translateY(-3px);
+        }
+        .card.c { border-left-color: var(--kahoot-blue); }
+        .card.l { border-left-color: var(--kahoot-red); }
+        .card.e { border-left-color: var(--kahoot-yellow); }
+        .card.a { border-left-color: var(--kahoot-green); }
+        .card.r { border-left-color: var(--kahoot-purple); }
+        
+        .card h2 {
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            font-size: 1.6rem;
+            color: #111;
+        }
+        .card h2 span.letter {
+            display: inline-block;
+            width: 45px;
+            height: 45px;
+            line-height: 45px;
+            text-align: center;
+            border-radius: 8px;
+            color: white;
+            margin-right: 15px;
+            font-weight: bold;
+            font-size: 1.8rem;
+        }
+        .c .letter { background-color: var(--kahoot-blue); }
+        .l .letter { background-color: var(--kahoot-red); }
+        .e .letter { background-color: var(--kahoot-yellow); }
+        .a .letter { background-color: var(--kahoot-green); }
+        .r .letter { background-color: var(--kahoot-purple); }
+
+        .content-group {
+            margin-top: 15px;
+        }
+        h3 {
+            font-size: 1.2rem;
+            color: #444;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        ul {
+            padding-left: 25px;
+            margin-bottom: 20px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        strong {
+            color: #222;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #777;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>Kahoot! System Analysis</h1>
+        <p>การวิเคราะห์โครงสร้างการออกแบบซอฟต์แวร์ด้วยเฟรมเวิร์ก Brief C.L.E.A.R.</p>
+    </div>
+
+    <div class="card c">
+        <h2><span class="letter">C</span> Customer [คนใช้มีใครบ้าง]</h2>
+        <div class="content-group">
+            <p>ผู้ใช้งานในระบบ Kahoot แบ่งออกเป็น 2 กลุ่มหลักที่มีบทบาทแตกต่างกันอย่างชัดเจน:</p>
+            <ul>
+                <li><strong>Host / Creator (ผู้สร้างและผู้คุมเกม):</strong> ได้แก่ คุณครู, อาจารย์, วิทยากร, ผู้จัดอบรม, แอดมินองค์กร หรือผู้ใช้ทั่วไปที่ต้องการสร้างกิจกรรม</li>
+                <li><strong>Player / Participant (ผู้เล่น):</strong> ได้แก่ นักเรียน, นักศึกษา, พนักงาน, หรือผู้เข้าร่วมกิจกรรมทั่วไป</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="card l">
+        <h2><span class="letter">L</span> Looking For [เขามองหาอะไร / เป้าหมายคืออะไร]</h2>
+        <div class="content-group">
+            <h3>Host (ผู้สร้าง) มองหา:</h3>
+            <ul>
+                <li>เครื่องมือที่ใช้งานง่าย รวดเร็ว ในการสร้างสื่อการสอนหรือแบบทดสอบ</li>
+                <li>วิธีการดึงดูดความสนใจ (Engagement) และทำให้ผู้เข้าร่วมมีส่วนร่วมสูงสุด</li>
+                <li>ข้อมูลประเมินผลแบบเรียลไทม์ (Real-time Analytics) เพื่อดูว่าผู้เรียนเข้าใจเนื้อหาหรือไม่</li>
+            </ul>
+            <h3>Player (ผู้เล่น) มองหา:</h3>
+            <ul>
+                <li>ประสบการณ์การเรียนรู้หรือการประเมินผลที่สนุกสนาน ไม่ตึงเครียด (Gamification)</li>
+                <li>ความท้าทายและการแข่งขัน (ผ่านระบบการนับคะแนนและจัดอันดับ)</li>
+                <li>ความง่ายในการเข้าถึง (ไม่ต้องสมัครสมาชิก ไม่ต้องโหลดแอป แค่มี PIN ก็เล่นได้เลย)</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="card e">
+        <h2><span class="letter">E</span> Experience [เขาเจอ/ทำอะไรในระบบบ้าง]</h2>
+        <div class="content-group">
+            <h3>User Journey ของ Host:</h3>
+            <ul>
+                <li>สมัครสมาชิก / ล็อกอิน</li>
+                <li>สร้างชุดคำถาม (กำหนดโจทย์, ใส่รูป/วิดีโอ, กำหนดตัวเลือก, ระบุข้อที่ถูก, ตั้งเวลา)</li>
+                <li>กดเปิดห้องเกม (Host Game) ระบบจะสร้างหน้าจอ Lobby พร้อม <strong>Game PIN</strong></li>
+                <li>ควบคุมจังหวะของเกม (กดเริ่มเกม, กดแสดงผลคะแนน, กดเปลี่ยนข้อ)</li>
+                <li>เมื่อจบเกม ดูสรุปผลผู้ชนะ และดาวน์โหลด Report สถิติการตอบของทุกคน</li>
+            </ul>
+            <h3>User Journey ของ Player:</h3>
+            <ul>
+                <li>เข้าเว็บไซต์ kahoot.it (ผ่านมือถือ/แท็บเล็ต) หรือเปิดแอปพลิเคชัน</li>
+                <li>กรอก Game PIN ที่เห็นบนหน้าจอของ Host และตั้งชื่อเล่น (Nickname) เพื่อเข้าห้อง</li>
+                <li>มองหน้าจอของ Host เพื่ออ่านคำถามและตัวเลือก</li>
+                <li>มองหน้าจอตัวเอง แล้วกดปุ่มสี/สัญลักษณ์ที่ตรงกับคำตอบที่ถูกต้องให้เร็วที่สุด</li>
+                <li>ดูคะแนนของตัวเองและลุ้นอันดับ (Leaderboard) ระหว่างข้อและตอนจบเกม</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="card a">
+        <h2><span class="letter">A</span> Attributes Data [ข้อมูลสำคัญที่ระบบต้องจัดเก็บ]</h2>
+        <div class="content-group">
+            <p>ในการออกแบบฐานข้อมูลของ Kahoot ระบบจำเป็นต้องเก็บข้อมูล (Entities) หลักๆ ดังนี้:</p>
+            <ul>
+                <li><strong>User Data (ข้อมูลผู้สร้าง):</strong> User_ID, Name, Email, Password_Hash, Subscription_Plan</li>
+                <li><strong>Kahoot/Quiz Data (ข้อมูลชุดคำถาม):</strong> Quiz_ID, User_ID, Title, Description, Cover_Image, Visibility</li>
+                <li><strong>Question & Choice Data (ข้อมูลคำถาม):</strong> Question_ID, Quiz_ID, Question_Type, Question_Text, Media_URL, Time_Limit, Choice_ID, Choice_Text, Is_Correct</li>
+                <li><strong>Session/Room Data (ข้อมูลห้องเกม):</strong> Session_ID, Quiz_ID, Host_User_ID, Game_PIN, Status, Created_At</li>
+                <li><strong>Player Data (ข้อมูลผู้เล่น):</strong> Player_ID, Session_ID, Nickname, Total_Score, Current_Rank</li>
+                <li><strong>Interaction/Answer Data (ข้อมูลการตอบ):</strong> Answer_ID, Player_ID, Question_ID, Selected_Choice_ID, Response_Time_Ms, Points_Earned</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="card r">
+        <h2><span class="letter">R</span> Rules [กฎ / เงื่อนไข / ข้อยกเว้นของระบบ]</h2>
+        <div class="content-group">
+            <ul>
+                <li><strong>Authentication Rule:</strong> ผู้เล่น (Player) ไม่จำเป็นต้องมีบัญชีผู้ใช้ อาศัยแค่ Game PIN เพื่อเข้าห้องชั่วคราว แต่ผู้สร้าง (Host) ต้องล็อกอินเสมอ</li>
+                <li><strong>Access Rule:</strong> Game PIN จะต้องตรงกับ Session ที่สถานะเป็น Active เท่านั้น หากห้องปิดแล้ว PIN นั้นจะใช้ไม่ได้</li>
+                <li><strong>Scoring Rule (กฎการให้คะแนน):</strong> ต้องตอบให้ "ถูก" และ "เร็ว" หากตอบผิดหรือหมดเวลาจะได้ 0 คะแนน</li>
+                <li><strong>Moderation Rule:</strong> Host มีสิทธิ์คลิก "เตะ" (Kick) ผู้เล่นที่ตั้งชื่อไม่เหมาะสมออกจาก Lobby ได้</li>
+                <li><strong>UI/UX Rule:</strong> โดยค่าเริ่มต้น หน้าจอของ Player จะไม่แสดงข้อความคำถามและตัวเลือก จะแสดงเพียงปุ่มสี เพื่อบีบให้ผู้เล่นต้องเงยหน้ามองหน้าจอส่วนรวม (หน้าจอ Host)</li>
+                <li><strong>Limitation Rule:</strong> ผู้เล่นสูงสุดต่อห้อง หรือประเภทคำถามพิเศษ จะถูกจำกัดการใช้งานตามระดับแพ็กเกจ (Subscription Plan) ของ Host</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="footer">
+        Generated by Antigravity
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,321 @@
+:root {
+  --kahoot-purple: #46178f;
+  --kahoot-blue: #1368ce;
+  --kahoot-red: #e21b3c;
+  --kahoot-yellow: #d89e00;
+  --kahoot-green: #26890c;
+  --bg-color: #f2f5f7;
+  --text-main: #333;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  overflow-x: hidden;
+}
+
+.host-container, .player-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.host-container {
+  background-color: var(--kahoot-purple);
+  color: white;
+}
+
+/* Host Lobby */
+.lobby-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+.pin-display {
+  font-size: 5rem;
+  font-weight: 800;
+  background: white;
+  color: var(--text-main);
+  padding: 20px 40px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  letter-spacing: 5px;
+}
+.players-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+  max-width: 800px;
+}
+.player-badge {
+  background: rgba(255,255,255,0.2);
+  padding: 10px 20px;
+  border-radius: 30px;
+  font-weight: 600;
+  font-size: 1.2rem;
+  backdrop-filter: blur(5px);
+  animation: popIn 0.3s ease-out forwards;
+}
+
+/* Buttons */
+.btn-primary {
+  background-color: #333;
+  color: white;
+  border: none;
+  padding: 15px 40px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.1s, background-color 0.2s;
+  box-shadow: 0 6px 0 #111;
+  margin-top: 30px;
+}
+.btn-primary:active {
+  transform: translateY(6px);
+  box-shadow: none;
+}
+
+/* Question Host View */
+.question-view {
+  width: 100%;
+  max-width: 1000px;
+  text-align: center;
+}
+.question-text {
+  font-size: 3rem;
+  font-weight: bold;
+  margin-bottom: 40px;
+  background: white;
+  color: var(--text-main);
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+.choices-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.choice-card {
+  padding: 30px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 8px 0 rgba(0,0,0,0.2);
+  color: white;
+  position: relative;
+  transition: opacity 0.3s;
+}
+.c-0 { background-color: var(--kahoot-red); }
+.c-1 { background-color: var(--kahoot-blue); }
+.c-2 { background-color: var(--kahoot-yellow); }
+.c-3 { background-color: var(--kahoot-green); }
+.choice-card.fade { opacity: 0.3; }
+
+/* Player View */
+.player-container {
+  background-color: var(--bg-color);
+}
+.join-form {
+  background: white;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+  max-width: 400px;
+}
+.input-field {
+  padding: 15px;
+  font-size: 1.2rem;
+  border: 2px solid #ccc;
+  border-radius: 6px;
+  text-align: center;
+  font-weight: bold;
+}
+.input-field:focus {
+  border-color: var(--kahoot-purple);
+  outline: none;
+}
+.join-btn {
+  background-color: #333;
+  color: white;
+  border: none;
+  padding: 15px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #111;
+}
+.join-btn:active {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+/* Player Pad Grid */
+.pad-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 10px;
+  width: 100%;
+  height: 80vh;
+  max-width: 600px;
+}
+.pad-btn {
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 8px 0 rgba(0,0,0,0.2);
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.1s;
+}
+.pad-btn:active {
+  transform: translateY(8px);
+  box-shadow: none;
+}
+.pad-btn.selected {
+  border: 4px solid white;
+  opacity: 1;
+}
+.pad-btn.dim {
+  opacity: 0.5;
+}
+
+.submit-multi-btn {
+  margin-top: 15px;
+  width: 100%;
+  max-width: 600px;
+  background-color: #333;
+  color: white;
+  padding: 20px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 6px 0 #111;
+  cursor: pointer;
+}
+.submit-multi-btn:active {
+  transform: translateY(6px);
+  box-shadow: none;
+}
+
+/* Messages */
+.status-message {
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
+  animation: pulse 2s infinite;
+}
+
+@keyframes popIn {
+  from { transform: scale(0.5); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+/* Leaderboard */
+.leaderboard {
+  background: white;
+  color: var(--text-main);
+  padding: 40px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 600px;
+}
+.leaderboard h2 {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  color: var(--kahoot-purple);
+}
+.lb-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.5rem;
+  font-weight: bold;
+  padding: 15px;
+  border-bottom: 2px solid #eee;
+}
+.lb-row:nth-child(2) { background: #ffd700; color: #111; border-radius: 8px;} /* 1st */
+.lb-row:nth-child(3) { background: #c0c0c0; color: #111; border-radius: 8px;} /* 2nd */
+.lb-row:nth-child(4) { background: #cd7f32; color: #111; border-radius: 8px;} /* 3rd */
+
+.spinner {
+  border: 8px solid rgba(255,255,255,0.3);
+  border-top: 8px solid white;
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+  animation: spin 1s linear infinite;
+  margin: 20px auto;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Poll bar */
+.poll-bar-container {
+    width: 100%;
+    height: 20px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 4px;
+    margin-top: 10px;
+    position: relative;
+    overflow: hidden;
+}
+.poll-bar-fill {
+    height: 100%;
+    background: rgba(255,255,255,0.8);
+    transition: width 1s ease-out;
+}
+
+/* Rank indicator */
+.rank-indicator {
+    margin-left: 15px;
+    font-weight: bold;
+    display: inline-block;
+}
+.rank-indicator.up { color: #28a745; animation: bounceUp 1s ease; }
+.rank-indicator.down { color: #dc3545; animation: bounceDown 1s ease; }
+.rank-indicator.same { color: #6c757d; }
+
+@keyframes bounceUp {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+@keyframes bounceDown {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(5px); }
+}
+
+.lb-row.rank-anim {
+    animation: slideIn 0.5s ease forwards;
+    opacity: 0;
+}
+@keyframes slideIn {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
