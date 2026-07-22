@@ -224,7 +224,7 @@ export default function CreatorView() {
             width: '100%', 
             maxWidth: '800px', 
             aspectRatio: '16/9', 
-            backgroundColor: '#fff', 
+            backgroundColor: '#ffcc00', 
             boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
             borderRadius: '8px',
             position: 'relative',
@@ -235,7 +235,7 @@ export default function CreatorView() {
             
             {/* Background Image if Fullscreen */}
             {activeSlide.image && activeSlide.isFullScreenImage && (
-              <img src={activeSlide.image} alt="Background" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0, opacity: 0.8 }} />
+              <img src={activeSlide.image} alt="Background" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'contain', zIndex: 0, opacity: 0.8 }} />
             )}
 
             <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', height: '100%', padding: '20px' }}>
@@ -248,7 +248,7 @@ export default function CreatorView() {
               {/* Middle (Image) */}
               <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px 0', minHeight: 0 }}>
                 {activeSlide.image && !activeSlide.isFullScreenImage && (
-                  <div style={{ backgroundColor: '#eee', padding: '10px', borderRadius: '8px', height: '100%', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <div style={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', padding: '10px', borderRadius: '8px', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                     <img src={activeSlide.image} alt="Slide" style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain', borderRadius: '4px' }} />
                   </div>
                 )}
