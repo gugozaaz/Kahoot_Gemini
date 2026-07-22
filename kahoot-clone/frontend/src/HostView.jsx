@@ -166,7 +166,7 @@ export default function HostView() {
              <span style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#333', background: 'white', padding: '10px 20px', borderRadius: '8px', boxShadow: '0 2px 5px rgba(0,0,0,0.2)' }}>Answers: {answersCount} / {players.length}</span>
           </div>
 
-          <div style={{ textAlign: 'center', backgroundColor: 'rgba(255,255,255,0.9)', padding: '20px', borderRadius: '8px', fontSize: '2.5rem', fontWeight: 'bold', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }}>
+          <div style={{ textAlign: 'center', backgroundColor: '#fff', padding: '20px', borderRadius: '8px', fontSize: '2.5rem', fontWeight: 'bold', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }}>
             {currentQuestion?.text}
           </div>
 
@@ -213,7 +213,7 @@ export default function HostView() {
             }}>Next</button>
           </div>
 
-          <div style={{ textAlign: 'center', backgroundColor: 'rgba(255,255,255,0.9)', padding: '20px', borderRadius: '8px', fontSize: '2.5rem', fontWeight: 'bold', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }}>
+          <div style={{ textAlign: 'center', backgroundColor: '#fff', padding: '20px', borderRadius: '8px', fontSize: '2.5rem', fontWeight: 'bold', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }}>
             Results: {currentQuestion?.text}
           </div>
 
@@ -222,12 +222,13 @@ export default function HostView() {
             {currentQuestion?.choices.map((choice, i) => {
                const votes = resultData?.answersStats[i] || 0;
                const percent = totalVotes === 0 ? 0 : Math.round((votes / totalVotes) * 100);
-               const height = Math.max(percent * 3, 10); 
+               const height = Math.max(percent, 5); 
+               const isCorrect = resultData?.correctAnswers.includes(i);
                
                return (
-                 <div key={`poll-${i}`} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100px' }}>
+                 <div key={`poll-${i}`} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', width: '100px', height: '100%' }}>
                    <span style={{ fontWeight: 'bold', fontSize: '2rem', marginBottom: '10px', color: '#333' }}>{votes}</span>
-                   <div className={`c-${i}`} style={{ width: '100%', height: `${height}px`, transition: 'height 1s ease-out', borderRadius: '8px 8px 0 0', boxShadow: '0 2px 10px rgba(0,0,0,0.2)' }}></div>
+                   <div className={`c-${i}`} style={{ width: '100%', height: `${height}%`, opacity: isCorrect ? 1 : 0.4, transition: 'height 1s ease-out', borderRadius: '8px 8px 0 0', boxShadow: '0 2px 10px rgba(0,0,0,0.2)' }}></div>
                  </div>
                )
             })}
