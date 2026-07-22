@@ -117,6 +117,8 @@ io.on('connection', (socket) => {
         io.to(pin).emit('new-question', {
             index: game.currentQuestionIndex,
             text: currentQ.text,
+            image: currentQ.image,
+            isFullScreenImage: currentQ.isFullScreenImage,
             choices: currentQ.choices,
             timeLimit: currentQ.timeLimit
         });

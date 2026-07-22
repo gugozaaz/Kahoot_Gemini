@@ -163,7 +163,6 @@ export default function HostView() {
           
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
              <span style={{ background: 'white', color: '#333', padding: '10px 20px', borderRadius: '50%', fontWeight: 'bold', fontSize: '2rem', boxShadow: '0 2px 5px rgba(0,0,0,0.2)' }}>{timeLeft}</span>
-             <button className="btn-primary" onClick={showResult}>Skip / Show Results</button>
              <span style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#333', background: 'white', padding: '10px 20px', borderRadius: '8px', boxShadow: '0 2px 5px rgba(0,0,0,0.2)' }}>Answers: {answersCount} / {players.length}</span>
           </div>
 
