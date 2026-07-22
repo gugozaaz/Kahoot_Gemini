@@ -158,7 +158,7 @@ export default function HostView() {
           <div style={{ marginBottom: '20px', fontSize: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ 
               background: 'white', 
-              color: 'var(--kahoot-purple)', 
+              color: '#333', 
               padding: '10px 20px', 
               borderRadius: '50%',
               fontWeight: 'bold',

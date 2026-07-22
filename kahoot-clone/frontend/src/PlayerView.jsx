@@ -75,9 +75,9 @@ export default function PlayerView() {
 
   if (!joined) {
     return (
-      <div className="player-container">
+      <div className="player-container" style={{ backgroundColor: '#ffcc00' }}>
         <form className="join-form" onSubmit={handleJoin}>
-          <h1 style={{ textAlign: 'center', color: 'var(--kahoot-purple)' }}>Kamooy!</h1>
+          <h1 style={{ textAlign: 'center', color: '#fff', textShadow: '2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000' }}>Kamooy!</h1>
           {initialPin ? null : (
             <input 
               className="input-field" 
@@ -108,7 +108,7 @@ export default function PlayerView() {
 
   if (gameState === 'WAITING_QUESTION') {
     return (
-      <div className="player-container" style={{ backgroundColor: 'var(--kahoot-purple)', color: 'white' }}>
+      <div className="player-container" style={{ backgroundColor: 'var(--theme-yellow)', color: '#333' }}>
         <div className="status-message">Waiting for others...</div>
       </div>
     );
@@ -116,7 +116,7 @@ export default function PlayerView() {
 
   if (gameState === 'QUESTION_ACTIVE' && submitted) {
     return (
-      <div className="player-container" style={{ backgroundColor: 'var(--kahoot-purple)', color: 'white' }}>
+      <div className="player-container" style={{ backgroundColor: 'var(--theme-yellow)', color: '#333' }}>
         <div className="status-message">
           Waiting for others...
           <div className="spinner"></div>
@@ -157,7 +157,7 @@ export default function PlayerView() {
     const score = resultData?.scores?.[socket.id] || 0;
     
     return (
-      <div className="player-container" style={{ backgroundColor: 'var(--kahoot-purple)', color: 'white' }}>
+      <div className="player-container" style={{ backgroundColor: 'var(--theme-yellow)', color: '#333' }}>
         <div className="status-message">
           Your Score
           <div style={{ fontSize: '3rem', marginTop: '20px' }}>{score}</div>

@@ -1,5 +1,5 @@
 :root {
-  --kahoot-purple: #46178f;
+  --theme-yellow: #ffcc00;
   --kahoot-blue: #1368ce;
   --kahoot-red: #e21b3c;
   --kahoot-yellow: #d89e00;
@@ -151,7 +151,7 @@ body {
   font-weight: bold;
 }
 .input-field:focus {
-  border-color: var(--kahoot-purple);
+  border-color: var(--theme-yellow);
   outline: none;
 }
 .join-btn {
@@ -250,7 +250,7 @@ body {
   text-align: center;
   font-size: 2.5rem;
   margin-bottom: 20px;
-  color: var(--kahoot-purple);
+  color: var(--theme-yellow);
 }
 .lb-row {
   display: flex;
