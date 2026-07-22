@@ -1,26 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { QRCodeSVG } from 'qrcode.react';
 import { io } from 'socket.io-client';
 
 // Change this based on deployment later
 const socket = io('http://localhost:3001');
 
-// Mock questions for Phase 1
-const SAMPLE_QUESTIONS = [
-  {
-    text: "Which of the following are fruits?",
-    choices: ["Apple", "Carrot", "Banana", "Potato"],
-    correctAnswers: [0, 2], // Multiple correct answers
-    timeLimit: 30
-  },
-  {
-    text: "Which colors make up the French flag?",
-    choices: ["Red", "Green", "Blue", "White"],
-    correctAnswers: [0, 2, 3], // Multiple correct answers
-    timeLimit: 30
-  }
-];
-
 export default function HostView() {
+  const { id } = useParams();
+  const navigate = useNavigate();
   const [pin, setPin] = useState(null);
   const [players, setPlayers] = useState([]);
   const [gameState, setGameState] = useState('INIT'); // INIT, LOBBY, QUESTION_ACTIVE, QUESTION_RESULT, LEADERBOARD
@@ -39,6 +27,13 @@ export default function HostView() {
     }
     return () => clearInterval(timer);
   }, [gameState, timeLeft]);
+
+  useEffect(() => {
+    if (gameState === 'INIT') {
+      createGame();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     socket.on('player-joined', (player) => {
@@ -81,7 +76,28 @@ export default function HostView() {
   }, []);
 
   const createGame = () => {
-    socket.emit('create-game', SAMPLE_QUESTIONS, (res) => {
+    const saved = localStorage.getItem('kamooy_presentations');
+    if (!saved) { alert('No presentations found'); return navigate('/dashboard'); }
+    const parsed = JSON.parse(saved);
+    const presentation = parsed.find(p => p.id === id);
+    if (!presentation || !presentation.slides) { alert('Presentation not found'); return navigate('/dashboard'); }
+
+    // Map creator slides to backend format
+    const questions = presentation.slides.map(slide => {
+      const validAnswers = slide.answers.filter(a => a.text.trim() !== '');
+      const choices = validAnswers.map(a => a.text);
+      const correctAnswers = validAnswers.map((a, i) => a.isCorrect ? i : -1).filter(i => i !== -1);
+      
+      return {
+        text: slide.question,
+        choices,
+        correctAnswers,
+        timeLimit: slide.timeLimit || 30,
+        scoreMultiplier: slide.scoreMultiplier !== undefined ? slide.scoreMultiplier : 1
+      };
+    });
+
+    socket.emit('create-game', questions, (res) => {
       if (res.success) {
         setPin(res.pin);
         setGameState('LOBBY');
@@ -104,8 +120,8 @@ export default function HostView() {
   if (gameState === 'INIT') {
     return (
       <div className="host-container">
-        <h1 style={{ fontSize: '4rem', marginBottom: '20px' }}>Kahoot Clone</h1>
-        <button className="btn-primary" onClick={createGame}>Create Game</button>
+        <h1 style={{ fontSize: '4rem', marginBottom: '20px', color: '#fff', textShadow: '2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000' }}>Kamooy!</h1>
+        <p>Loading...</p>
       </div>
     );
   }
@@ -114,8 +130,12 @@ export default function HostView() {
     return (
       <div className="host-container">
         <div className="lobby-header">
-          <h2>Join at www.kahoot.it (or your domain)</h2>
-          <div className="pin-display">{pin}</div>
+          <h2>Join at {window.location.origin}</h2>
+          <div className="pin-display" style={{ marginBottom: '20px' }}>PIN: {pin}</div>
+          <div style={{ background: 'white', padding: '10px', display: 'inline-block', borderRadius: '8px' }}>
+            <QRCodeSVG value={`${window.location.origin}/play?pin=${pin}`} size={200} />
+          </div>
+          <p style={{ marginTop: '10px' }}>Scan to join</p>
         </div>
         <div style={{ marginBottom: '20px', fontSize: '1.5rem' }}>Players: {players.length}</div>
         <div className="players-grid">

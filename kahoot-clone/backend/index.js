@@ -77,6 +77,9 @@ io.on('connection', (socket) => {
                     if (points < 0) points = 0;
                     if (points > 1000) points = 1000;
                     
+                    const multiplier = currentQ.scoreMultiplier !== undefined ? currentQ.scoreMultiplier : 1;
+                    points = points * multiplier;
+                    
                     game.players[playerId].score += points;
                 }
             }
@@ -221,9 +224,17 @@ io.on('connection', (socket) => {
 });
 
 function getAnswerStats(game) {
-    const stats = { 0: 0, 1: 0, 2: 0, 3: 0 };
+    const stats = {};
+    const currentQ = game.questions[game.currentQuestionIndex];
+    if (currentQ && currentQ.choices) {
+        currentQ.choices.forEach((_, i) => stats[i] = 0);
+    }
     for (const answerData of Object.values(game.answers)) {
-        if (stats[answerData.choice] !== undefined) stats[answerData.choice]++;
+        if (stats[answerData.choice] !== undefined) {
+            stats[answerData.choice]++;
+        } else {
+            stats[answerData.choice] = 1;
+        }
     }
     return stats;
 }

@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { io } from 'socket.io-client';
 
 const socket = io('http://localhost:3001');
 
 export default function PlayerView() {
-  const [pin, setPin] = useState('');
+  const [searchParams] = useSearchParams();
+  const initialPin = searchParams.get('pin') || '';
+  const [pin, setPin] = useState(initialPin);
   const [nickname, setNickname] = useState('');
   const [joined, setJoined] = useState(false);
   const [gameState, setGameState] = useState('LOBBY'); // LOBBY, QUESTION_ACTIVE, QUESTION_RESULT
@@ -12,16 +15,18 @@ export default function PlayerView() {
   const [submitted, setSubmitted] = useState(false);
   const [myScore, setMyScore] = useState(0);
   const [resultData, setResultData] = useState(null);
+  const [choicesCount, setChoicesCount] = useState(4);
 
   useEffect(() => {
     socket.on('game-started', () => {
       setGameState('WAITING_QUESTION');
     });
 
-    socket.on('new-question', () => {
+    socket.on('new-question', (q) => {
       setGameState('QUESTION_ACTIVE');
       setSelectedIndex(null);
       setSubmitted(false);
+      setChoicesCount(q.choices ? q.choices.length : 4);
     });
 
     socket.on('question-result', (data) => {
@@ -72,13 +77,15 @@ export default function PlayerView() {
     return (
       <div className="player-container">
         <form className="join-form" onSubmit={handleJoin}>
-          <h1 style={{ textAlign: 'center', color: 'var(--kahoot-purple)' }}>Kahoot Clone</h1>
-          <input 
-            className="input-field" 
-            placeholder="Game PIN" 
-            value={pin}
-            onChange={e => setPin(e.target.value)}
-          />
+          <h1 style={{ textAlign: 'center', color: 'var(--kahoot-purple)' }}>Kamooy!</h1>
+          {initialPin ? null : (
+            <input 
+              className="input-field" 
+              placeholder="Game PIN" 
+              value={pin}
+              onChange={e => setPin(e.target.value)}
+            />
+          )}
           <input 
             className="input-field" 
             placeholder="Nickname" 
@@ -122,10 +129,10 @@ export default function PlayerView() {
     return (
       <div className="player-container">
         <div className="pad-grid">
-          {[0, 1, 2, 3].map(i => (
+          {Array.from({ length: choicesCount }).map((_, i) => (
             <button 
               key={i} 
-              className={`pad-btn c-${i}`}
+              className={`pad-btn c-${i % 6}`}
               onClick={() => selectChoice(i)}
             />
           ))}
