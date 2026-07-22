@@ -75,22 +75,37 @@ export default function PlayerView() {
 
   if (!joined) {
     return (
-      <div className="player-container" style={{ backgroundColor: '#ffcc00' }}>
-        <form className="join-form" onSubmit={handleJoin}>
-          <h1 style={{ textAlign: 'center', color: '#fff', textShadow: '2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000' }}>Kamooy!</h1>
+      <div className="player-container" style={{ backgroundColor: '#ffcc00', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+          <h1 style={{ fontSize: '4rem', color: '#fff', textShadow: '2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000', margin: 0 }}>
+            Kamooy!
+          </h1>
+        </div>
+
+        <form className="join-form" onSubmit={handleJoin} style={{
+          backgroundColor: '#fff',
+          padding: '20px',
+          borderRadius: '5px',
+          boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
+          display: 'flex',
+          flexDirection: 'column',
+          width: '300px'
+        }}>
           {initialPin ? null : (
             <input 
               className="input-field" 
               placeholder="Game PIN" 
               value={pin}
               onChange={e => setPin(e.target.value)}
+              style={{ marginBottom: '10px' }}
             />
           )}
           <input 
             className="input-field" 
-            placeholder="Nickname" 
+            placeholder="Enter your name" 
             value={nickname}
             onChange={e => setNickname(e.target.value)}
+            style={{ marginBottom: '10px' }}
           />
           <button className="join-btn" type="submit">Enter</button>
         </form>
