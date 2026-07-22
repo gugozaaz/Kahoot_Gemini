@@ -11,7 +11,8 @@ const io = new Server(server, {
   cors: {
     origin: "*",
     methods: ["GET", "POST"]
-  }
+  },
+  maxHttpBufferSize: 1e8 // 100 MB for large image uploads
 });
 
 // In-memory data store for Phase 1
