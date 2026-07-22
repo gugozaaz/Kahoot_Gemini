@@ -90,6 +90,8 @@ export default function HostView() {
       
       return {
         text: slide.question,
+        image: slide.image,
+        isFullScreenImage: slide.isFullScreenImage,
         choices,
         correctAnswers,
         timeLimit: slide.timeLimit || 30,
@@ -152,30 +154,43 @@ export default function HostView() {
 
   if (gameState === 'QUESTION_ACTIVE') {
     return (
-      <div className="host-container">
-        <div className="question-view">
-          <div className="question-text">{currentQuestion?.text}</div>
-          <div style={{ marginBottom: '20px', fontSize: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ 
-              background: 'white', 
-              color: '#333', 
-              padding: '10px 20px', 
-              borderRadius: '50%',
-              fontWeight: 'bold',
-              fontSize: '2rem'
-            }}>
-              {timeLeft}
-            </span>
-            <span>Answers: {answersCount} / {players.length}</span>
+      <div className="host-container" style={{ position: 'relative', display: 'flex', flexDirection: 'column', height: '100vh', padding: '20px', overflow: 'hidden' }}>
+        {currentQuestion?.image && currentQuestion?.isFullScreenImage && (
+          <img src={currentQuestion.image} alt="Background" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'contain', zIndex: 0, opacity: 0.8 }} />
+        )}
+        
+        <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', height: '100%', maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
+          
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+             <span style={{ background: 'white', color: '#333', padding: '10px 20px', borderRadius: '50%', fontWeight: 'bold', fontSize: '2rem', boxShadow: '0 2px 5px rgba(0,0,0,0.2)' }}>{timeLeft}</span>
+             <button className="btn-primary" onClick={showResult}>Skip / Show Results</button>
+             <span style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#333', background: 'white', padding: '10px 20px', borderRadius: '8px', boxShadow: '0 2px 5px rgba(0,0,0,0.2)' }}>Answers: {answersCount} / {players.length}</span>
           </div>
-          <div className="choices-grid">
-            {currentQuestion?.choices.map((choice, i) => (
-              <div key={i} className={`choice-card c-${i}`}>
-                {choice}
+
+          <div style={{ textAlign: 'center', backgroundColor: 'rgba(255,255,255,0.9)', padding: '20px', borderRadius: '8px', fontSize: '2.5rem', fontWeight: 'bold', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }}>
+            {currentQuestion?.text}
+          </div>
+
+          {/* Middle (Image) */}
+          <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px 0', minHeight: 0 }}>
+            {currentQuestion?.image && !currentQuestion?.isFullScreenImage && (
+              <div style={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', padding: '15px', borderRadius: '8px', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <img src={currentQuestion.image} alt="Slide" style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain', borderRadius: '8px' }} />
               </div>
-            ))}
+            )}
           </div>
-          <button className="btn-primary" onClick={showResult}>Skip / Show Results</button>
+
+          {/* Answers */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+            {currentQuestion?.choices.map((choice, i) => {
+              const colors = ['#e21b3c', '#1368ce', '#d89e00', '#26890c', '#2eb8a6', '#8e44ad'];
+              return (
+                <div key={i} style={{ backgroundColor: colors[i % colors.length], color: 'white', padding: '20px', borderRadius: '8px', display: 'flex', alignItems: 'center', fontWeight: 'bold', fontSize: '1.8rem', minHeight: '80px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
+                  <div style={{ flex: 1 }}>{choice}</div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     );
@@ -185,42 +200,53 @@ export default function HostView() {
     const totalVotes = Object.values(resultData?.answersStats || {}).reduce((a, b) => a + b, 0);
     
     return (
-      <div className="host-container">
-        <div className="question-view">
-          <div className="question-text">Results</div>
+      <div className="host-container" style={{ position: 'relative', display: 'flex', flexDirection: 'column', height: '100vh', padding: '20px', overflow: 'hidden' }}>
+        {currentQuestion?.image && currentQuestion?.isFullScreenImage && (
+          <img src={currentQuestion.image} alt="Background" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'contain', zIndex: 0, opacity: 0.2 }} />
+        )}
+
+        <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', height: '100%', maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
           
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-end', height: '200px', gap: '40px', marginBottom: '40px' }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
+            <button className="btn-primary" onClick={() => {
+              socket.emit('show-leaderboard', pin);
+              setGameState('QUESTION_LEADERBOARD');
+            }}>Next</button>
+          </div>
+
+          <div style={{ textAlign: 'center', backgroundColor: 'rgba(255,255,255,0.9)', padding: '20px', borderRadius: '8px', fontSize: '2.5rem', fontWeight: 'bold', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }}>
+            Results: {currentQuestion?.text}
+          </div>
+
+          {/* Middle (Bar Chart) */}
+          <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'flex-end', padding: '20px 0', minHeight: 0, gap: '40px' }}>
             {currentQuestion?.choices.map((choice, i) => {
                const votes = resultData?.answersStats[i] || 0;
                const percent = totalVotes === 0 ? 0 : Math.round((votes / totalVotes) * 100);
-               // Max height is 150px (for 100%)
-               const height = Math.max(percent * 1.5, 5); 
+               const height = Math.max(percent * 3, 10); 
                
                return (
-                 <div key={`poll-${i}`} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '80px' }}>
-                   <span style={{ fontWeight: 'bold', fontSize: '1.5rem', marginBottom: '10px' }}>{votes}</span>
-                   <div className={`c-${i}`} style={{ width: '100%', height: `${height}px`, transition: 'height 1s ease-out', borderRadius: '4px 4px 0 0' }}></div>
+                 <div key={`poll-${i}`} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100px' }}>
+                   <span style={{ fontWeight: 'bold', fontSize: '2rem', marginBottom: '10px', color: '#333' }}>{votes}</span>
+                   <div className={`c-${i}`} style={{ width: '100%', height: `${height}px`, transition: 'height 1s ease-out', borderRadius: '8px 8px 0 0', boxShadow: '0 2px 10px rgba(0,0,0,0.2)' }}></div>
                  </div>
                )
             })}
           </div>
 
-          <div className="choices-grid">
+          {/* Answers */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
             {currentQuestion?.choices.map((choice, i) => {
+              const colors = ['#e21b3c', '#1368ce', '#d89e00', '#26890c', '#2eb8a6', '#8e44ad'];
               const isCorrect = resultData?.correctAnswers.includes(i);
-              
               return (
-                <div key={i} className={`choice-card c-${i} ${!isCorrect ? 'fade' : ''}`}>
-                  <span style={{flex: 1, textAlign: 'left'}}>{choice}</span>
-                  {isCorrect && <span style={{fontSize: '2rem'}}>✔</span>}
+                <div key={i} style={{ backgroundColor: colors[i % colors.length], color: 'white', padding: '20px', borderRadius: '8px', display: 'flex', alignItems: 'center', fontWeight: 'bold', fontSize: '1.8rem', minHeight: '80px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)', opacity: isCorrect ? 1 : 0.4 }}>
+                  <div style={{ flex: 1 }}>{choice}</div>
+                  {isCorrect && <span style={{ fontSize: '2.5rem' }}>✔</span>}
                 </div>
               );
             })}
           </div>
-          <button className="btn-primary" onClick={() => {
-            socket.emit('show-leaderboard', pin);
-            setGameState('QUESTION_LEADERBOARD');
-          }}>Next</button>
         </div>
       </div>
     );
