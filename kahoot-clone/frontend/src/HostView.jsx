@@ -174,10 +174,10 @@ export default function HostView() {
     return (
       <div className="host-container" style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', padding: '20px', overflow: 'hidden', backgroundColor: '#d89e00' }}>
         <div style={{ position: 'relative', top: '-10vh', textAlign: 'center' }}>
-          <div style={{ fontSize: '4rem', fontWeight: 'bold', color: 'white', textShadow: '2px 2px 4px rgba(0,0,0,0.3)', marginBottom: '40px' }}>
+          <div style={{ fontSize: '4rem', fontWeight: 'bold', color: '#333', marginBottom: '40px' }}>
             {currentQuestion?.text}
           </div>
-          <div style={{ fontSize: '6rem', fontWeight: 'bold', color: '#fff', textShadow: '2px 2px 4px rgba(0,0,0,0.3)', minHeight: '150px' }}>
+          <div style={{ fontSize: '6rem', fontWeight: 'bold', color: '#333', minHeight: '150px' }}>
             {previewTimeLeft <= 3 && previewTimeLeft > 0 ? previewTimeLeft : ''}
           </div>
         </div>

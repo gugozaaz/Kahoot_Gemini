@@ -11,6 +11,8 @@ export default function PlayerView() {
   const [nickname, setNickname] = useState('');
   const [joined, setJoined] = useState(false);
   const [gameState, setGameState] = useState('LOBBY'); // LOBBY, QUESTION_PREVIEW, QUESTION_ACTIVE, QUESTION_RESULT
+  const [currentQuestion, setCurrentQuestion] = useState(null);
+  const [previewTimeLeft, setPreviewTimeLeft] = useState(0);
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [submitted, setSubmitted] = useState(false);
   const [myScore, setMyScore] = useState(0);
@@ -18,12 +20,24 @@ export default function PlayerView() {
   const [choicesCount, setChoicesCount] = useState(4);
 
   useEffect(() => {
+    let timer;
+    if (gameState === 'QUESTION_PREVIEW' && previewTimeLeft > 0) {
+      timer = setInterval(() => {
+        setPreviewTimeLeft(prev => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [gameState, previewTimeLeft]);
+
+  useEffect(() => {
     socket.on('game-started', () => {
       setGameState('WAITING_QUESTION');
     });
 
-    socket.on('question-preview', () => {
+    socket.on('question-preview', (q) => {
+      setCurrentQuestion(q);
       setGameState('QUESTION_PREVIEW');
+      setPreviewTimeLeft(5);
     });
 
     socket.on('new-question', (q) => {
@@ -136,9 +150,14 @@ export default function PlayerView() {
 
   if (gameState === 'QUESTION_PREVIEW') {
     return (
-      <div className="player-container" style={{ backgroundColor: '#d89e00', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div className="status-message" style={{ fontSize: '2.5rem', fontWeight: 'bold' }}>
-          Get Ready!
+      <div className="player-container" style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: '20px', backgroundColor: '#d89e00', overflow: 'hidden' }}>
+        <div style={{ position: 'relative', top: '-5vh', textAlign: 'center' }}>
+          <div style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#333', marginBottom: '30px' }}>
+            {currentQuestion?.text}
+          </div>
+          <div style={{ fontSize: '5rem', fontWeight: 'bold', color: '#333', minHeight: '120px' }}>
+            {previewTimeLeft <= 3 && previewTimeLeft > 0 ? previewTimeLeft : ''}
+          </div>
         </div>
       </div>
     );
