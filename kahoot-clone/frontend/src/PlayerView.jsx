@@ -150,7 +150,7 @@ export default function PlayerView() {
 
   if (gameState === 'QUESTION_PREVIEW') {
     return (
-      <div className="player-container" style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: '20px', backgroundColor: '#d89e00', overflow: 'hidden' }}>
+      <div className="player-container" style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: '20px', backgroundColor: 'var(--theme-yellow)', overflow: 'hidden' }}>
         <div style={{ position: 'relative', top: '-5vh', textAlign: 'center', width: '90%' }}>
           <div style={{ backgroundColor: '#ffffff', padding: '20px 30px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.15)', fontSize: '2.5rem', fontWeight: 'bold', color: '#333', marginBottom: '30px', display: 'inline-block', width: '100%', boxSizing: 'border-box' }}>
             {currentQuestion?.text}
