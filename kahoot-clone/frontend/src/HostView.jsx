@@ -11,12 +11,13 @@ export default function HostView() {
   const navigate = useNavigate();
   const [pin, setPin] = useState(null);
   const [players, setPlayers] = useState([]);
-  const [gameState, setGameState] = useState('INIT'); // INIT, LOBBY, QUESTION_ACTIVE, QUESTION_RESULT, LEADERBOARD
+  const [gameState, setGameState] = useState('INIT'); // INIT, LOBBY, QUESTION_PREVIEW, QUESTION_ACTIVE, QUESTION_RESULT, LEADERBOARD
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const [answersCount, setAnswersCount] = useState(0);
   const [resultData, setResultData] = useState(null);
   const [leaderboard, setLeaderboard] = useState([]);
   const [timeLeft, setTimeLeft] = useState(0);
+  const [previewTimeLeft, setPreviewTimeLeft] = useState(0);
 
   useEffect(() => {
     let timer;
@@ -27,6 +28,16 @@ export default function HostView() {
     }
     return () => clearInterval(timer);
   }, [gameState, timeLeft]);
+
+  useEffect(() => {
+    let timer;
+    if (gameState === 'QUESTION_PREVIEW' && previewTimeLeft > 0) {
+      timer = setInterval(() => {
+        setPreviewTimeLeft(prev => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [gameState, previewTimeLeft]);
 
   useEffect(() => {
     if (gameState === 'INIT') {
@@ -42,6 +53,12 @@ export default function HostView() {
 
     socket.on('game-started', () => {
       setGameState('QUESTION_ACTIVE');
+    });
+
+    socket.on('question-preview', (q) => {
+      setCurrentQuestion(q);
+      setGameState('QUESTION_PREVIEW');
+      setPreviewTimeLeft(5);
     });
 
     socket.on('new-question', (q) => {
@@ -68,6 +85,7 @@ export default function HostView() {
     return () => {
       socket.off('player-joined');
       socket.off('game-started');
+      socket.off('question-preview');
       socket.off('new-question');
       socket.off('player-answered');
       socket.off('question-result');
@@ -148,6 +166,21 @@ export default function HostView() {
         {players.length > 0 && (
           <button className="btn-primary" onClick={startGame}>Start Game</button>
         )}
+      </div>
+    );
+  }
+
+  if (gameState === 'QUESTION_PREVIEW') {
+    return (
+      <div className="host-container" style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', padding: '20px', overflow: 'hidden', backgroundColor: '#d89e00' }}>
+        <div style={{ position: 'relative', top: '-10vh', textAlign: 'center' }}>
+          <div style={{ fontSize: '4rem', fontWeight: 'bold', color: 'white', textShadow: '2px 2px 4px rgba(0,0,0,0.3)', marginBottom: '40px' }}>
+            {currentQuestion?.text}
+          </div>
+          <div style={{ fontSize: '6rem', fontWeight: 'bold', color: '#fff', textShadow: '2px 2px 4px rgba(0,0,0,0.3)', minHeight: '150px' }}>
+            {previewTimeLeft <= 3 && previewTimeLeft > 0 ? previewTimeLeft : ''}
+          </div>
+        </div>
       </div>
     );
   }

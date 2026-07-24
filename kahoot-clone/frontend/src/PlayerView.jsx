@@ -10,7 +10,7 @@ export default function PlayerView() {
   const [pin, setPin] = useState(initialPin);
   const [nickname, setNickname] = useState('');
   const [joined, setJoined] = useState(false);
-  const [gameState, setGameState] = useState('LOBBY'); // LOBBY, QUESTION_ACTIVE, QUESTION_RESULT
+  const [gameState, setGameState] = useState('LOBBY'); // LOBBY, QUESTION_PREVIEW, QUESTION_ACTIVE, QUESTION_RESULT
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [submitted, setSubmitted] = useState(false);
   const [myScore, setMyScore] = useState(0);
@@ -20,6 +20,10 @@ export default function PlayerView() {
   useEffect(() => {
     socket.on('game-started', () => {
       setGameState('WAITING_QUESTION');
+    });
+
+    socket.on('question-preview', () => {
+      setGameState('QUESTION_PREVIEW');
     });
 
     socket.on('new-question', (q) => {
@@ -46,6 +50,7 @@ export default function PlayerView() {
 
     return () => {
       socket.off('game-started');
+      socket.off('question-preview');
       socket.off('new-question');
       socket.off('question-result');
       socket.off('show-leaderboard');
@@ -125,6 +130,16 @@ export default function PlayerView() {
     return (
       <div className="player-container" style={{ backgroundColor: 'var(--theme-yellow)', color: '#333' }}>
         <div className="status-message">Waiting for others...</div>
+      </div>
+    );
+  }
+
+  if (gameState === 'QUESTION_PREVIEW') {
+    return (
+      <div className="player-container" style={{ backgroundColor: '#d89e00', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div className="status-message" style={{ fontSize: '2.5rem', fontWeight: 'bold' }}>
+          Get Ready!
+        </div>
       </div>
     );
   }

@@ -109,24 +109,36 @@ io.on('connection', (socket) => {
 
     function startQuestion(pin) {
         const game = games[pin];
-        game.status = 'QUESTION_ACTIVE';
-        game.answers = {};
-        game.questionStartTime = Date.now();
         const currentQ = game.questions[game.currentQuestionIndex];
         
-        io.to(pin).emit('new-question', {
-            index: game.currentQuestionIndex,
+        game.status = 'QUESTION_PREVIEW';
+
+        io.to(pin).emit('question-preview', {
             text: currentQ.text,
-            image: currentQ.image,
-            isFullScreenImage: currentQ.isFullScreenImage,
-            choices: currentQ.choices,
-            timeLimit: currentQ.timeLimit
+            timeLimit: currentQ.timeLimit,
+            choicesCount: currentQ.choices.length
         });
 
         if (game.timer) clearTimeout(game.timer);
+        
         game.timer = setTimeout(() => {
-            triggerShowResult(pin);
-        }, currentQ.timeLimit * 1000);
+            game.status = 'QUESTION_ACTIVE';
+            game.answers = {};
+            game.questionStartTime = Date.now();
+            
+            io.to(pin).emit('new-question', {
+                index: game.currentQuestionIndex,
+                text: currentQ.text,
+                image: currentQ.image,
+                isFullScreenImage: currentQ.isFullScreenImage,
+                choices: currentQ.choices,
+                timeLimit: currentQ.timeLimit
+            });
+
+            game.timer = setTimeout(() => {
+                triggerShowResult(pin);
+            }, currentQ.timeLimit * 1000);
+        }, 5000);
     }
 
     socket.on('start-game', (pin) => {
