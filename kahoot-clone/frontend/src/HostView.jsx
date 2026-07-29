@@ -4,7 +4,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { io } from 'socket.io-client';
 
 // Change this based on deployment later
-const socket = io('http://localhost:3001');
+const socket = io();
 
 export default function HostView() {
   const { id } = useParams();
