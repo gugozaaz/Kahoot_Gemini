@@ -3,8 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
 import { io } from 'socket.io-client';
 
-// Change this based on deployment later
-const socket = io();
+// Set VITE_SOCKET_URL in production (e.g. on Vercel) to point at the backend
+const socket = io(import.meta.env.VITE_SOCKET_URL || undefined);
 
 export default function HostView() {
   const { id } = useParams();

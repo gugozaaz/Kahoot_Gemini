@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { io } from 'socket.io-client';
 
-const socket = io();
+// Set VITE_SOCKET_URL in production (e.g. on Vercel) to point at the backend
+const socket = io(import.meta.env.VITE_SOCKET_URL || undefined);
 
 export default function PlayerView() {
   const [searchParams] = useSearchParams();
