@@ -1,24 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { io } from 'socket.io-client';
-
-// Set VITE_SOCKET_URL in production (e.g. on Vercel) to point at the backend
-const socket = io(import.meta.env.VITE_SOCKET_URL || undefined);
+import { api } from './lib/api';
+import { useGameState } from './lib/useGameState';
 
 export default function PlayerView() {
   const [searchParams] = useSearchParams();
   const initialPin = searchParams.get('pin') || '';
   const [pin, setPin] = useState(initialPin);
   const [nickname, setNickname] = useState('');
-  const [joined, setJoined] = useState(false);
-  const [gameState, setGameState] = useState('LOBBY'); // LOBBY, QUESTION_PREVIEW, QUESTION_ACTIVE, QUESTION_RESULT
-  const [currentQuestion, setCurrentQuestion] = useState(null);
-  const [previewTimeLeft, setPreviewTimeLeft] = useState(0);
+  const [playerId, setPlayerId] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [submitted, setSubmitted] = useState(false);
-  const [myScore, setMyScore] = useState(0);
-  const [resultData, setResultData] = useState(null);
-  const [choicesCount, setChoicesCount] = useState(4);
+  const [previewTimeLeft, setPreviewTimeLeft] = useState(0);
+
+  const { state } = useGameState({ pin, role: 'player', token: playerId, enabled: !!playerId });
+
+  // Derived from server state (was: socket event handlers + local mirrors)
+  const gameState = state?.status || 'LOBBY'; // LOBBY, QUESTION_PREVIEW, QUESTION_ACTIVE, QUESTION_RESULT, QUESTION_LEADERBOARD, GAME_OVER
+  const currentQuestion = state?.question;
+  const myScore = state?.myScore || 0;
+  const resultData = state?.result;
+  const finalResult = state?.finalLeaderboard;
 
   useEffect(() => {
     let timer;
@@ -28,61 +30,44 @@ export default function PlayerView() {
       }, 1000);
     }
     return () => clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameState, previewTimeLeft]);
 
+  // Seed the preview countdown from the server timestamp
   useEffect(() => {
-    socket.on('game-started', () => {
-      setGameState('WAITING_QUESTION');
-    });
+    if (state?.status === 'QUESTION_PREVIEW') {
+      setPreviewTimeLeft(Math.ceil((state.previewTimeLeftMs || 0) / 1000));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state?.status, state?.currentIndex]);
 
-    socket.on('question-preview', (q) => {
-      setCurrentQuestion(q);
-      setGameState('QUESTION_PREVIEW');
-      setPreviewTimeLeft(5);
-    });
+  // New question -> allow answering again
+  useEffect(() => {
+    setSelectedIndex(null);
+    setSubmitted(false);
+  }, [state?.currentIndex]);
 
-    socket.on('new-question', (q) => {
-      setGameState('QUESTION_ACTIVE');
-      setSelectedIndex(null);
-      setSubmitted(false);
-      setChoicesCount(q.choices ? q.choices.length : 4);
-    });
-
-    socket.on('question-result', (data) => {
-      setResultData(data);
-      setGameState('QUESTION_RESULT');
-    });
-
-    socket.on('show-leaderboard', () => {
-      setGameState('QUESTION_LEADERBOARD');
-    });
-
-    socket.on('game-over', (leaderboard) => {
-      setGameState('GAME_OVER');
-      const me = leaderboard.find(p => p.id === socket.id);
-      if (me) setMyScore(me.score);
-    });
-
-    return () => {
-      socket.off('game-started');
-      socket.off('question-preview');
-      socket.off('new-question');
-      socket.off('question-result');
-      socket.off('show-leaderboard');
-      socket.off('game-over');
-    };
+  // Survive a page refresh within the same game
+  useEffect(() => {
+    const savedPin = initialPin || pin;
+    if (!savedPin) return;
+    const savedId = sessionStorage.getItem(`kamooy:${savedPin}`);
+    if (savedId) {
+      setPin(savedPin);
+      setPlayerId(savedId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleJoin = (e) => {
+  const handleJoin = async (e) => {
     e.preventDefault();
-    if (pin && nickname) {
-      socket.emit('join-game', { pin, nickname }, (res) => {
-        if (res.success) {
-          setJoined(true);
-        } else {
-          alert(res.message);
-        }
-      });
+    if (!pin || !nickname) return;
+    try {
+      const res = await api.joinGame(pin.trim(), nickname.trim());
+      sessionStorage.setItem(`kamooy:${pin.trim()}`, res.playerId);
+      setPlayerId(res.playerId);
+    } catch (err) {
+      alert(err.message);
     }
   };
 
@@ -90,8 +75,12 @@ export default function PlayerView() {
     if (submitted) return;
     setSelectedIndex(index);
     setSubmitted(true);
-    socket.emit('submit-answer', { pin, selectedIndex: index });
+    api.submitAnswer(pin.trim(), playerId, index).catch(() => {
+      // Same as the socket version: late answers after the reveal are ignored
+    });
   };
+
+  const joined = !!playerId;
 
   if (!joined) {
     return (
@@ -112,17 +101,17 @@ export default function PlayerView() {
           width: '300px'
         }}>
           {initialPin ? null : (
-            <input 
-              className="input-field" 
-              placeholder="Game PIN" 
+            <input
+              className="input-field"
+              placeholder="Game PIN"
               value={pin}
               onChange={e => setPin(e.target.value)}
               style={{ marginBottom: '10px' }}
             />
           )}
-          <input 
-            className="input-field" 
-            placeholder="Enter your name" 
+          <input
+            className="input-field"
+            placeholder="Enter your name"
             value={nickname}
             onChange={e => setNickname(e.target.value)}
             style={{ marginBottom: '10px' }}
@@ -137,14 +126,6 @@ export default function PlayerView() {
     return (
       <div className="player-container" style={{ backgroundColor: 'var(--kahoot-green)', color: 'white' }}>
         <div className="status-message">You're in!<br/>See your nickname on screen</div>
-      </div>
-    );
-  }
-
-  if (gameState === 'WAITING_QUESTION') {
-    return (
-      <div className="player-container" style={{ backgroundColor: 'var(--theme-yellow)', color: '#333' }}>
-        <div className="status-message">Waiting for others...</div>
       </div>
     );
   }
@@ -179,9 +160,9 @@ export default function PlayerView() {
     return (
       <div className="player-container">
         <div className="pad-grid">
-          {Array.from({ length: choicesCount }).map((_, i) => (
-            <button 
-              key={i} 
+          {Array.from({ length: currentQuestion?.choicesCount || 4 }).map((_, i) => (
+            <button
+              key={i}
               className={`pad-btn c-${i % 6}`}
               onClick={() => selectChoice(i)}
             />
@@ -193,7 +174,7 @@ export default function PlayerView() {
 
   if (gameState === 'QUESTION_RESULT') {
     const isCorrect = resultData?.correctAnswers?.includes(selectedIndex);
-    
+
     return (
       <div className="player-container" style={{ backgroundColor: isCorrect ? 'var(--kahoot-green)' : 'var(--kahoot-red)', color: 'white' }}>
         <div className="status-message">
@@ -204,13 +185,11 @@ export default function PlayerView() {
   }
 
   if (gameState === 'QUESTION_LEADERBOARD') {
-    const score = resultData?.scores?.[socket.id] || 0;
-    
     return (
       <div className="player-container" style={{ backgroundColor: 'var(--theme-yellow)', color: '#333' }}>
         <div className="status-message">
           Your Score
-          <div style={{ fontSize: '3rem', marginTop: '20px' }}>{score}</div>
+          <div style={{ fontSize: '3rem', marginTop: '20px' }}>{myScore}</div>
         </div>
       </div>
     );
@@ -219,7 +198,10 @@ export default function PlayerView() {
   if (gameState === 'GAME_OVER') {
     return (
       <div className="player-container" style={{ backgroundColor: 'var(--kahoot-red)', color: 'white' }}>
-        <div className="status-message">Game Over!<br/>Your Score: {myScore}</div>
+        <div className="status-message">
+          Game Over!<br/>Your Score: {finalResult?.myScore ?? myScore}
+          {finalResult?.myRank ? <><br/>Rank #{finalResult.myRank}</> : null}
+        </div>
       </div>
     );
   }
