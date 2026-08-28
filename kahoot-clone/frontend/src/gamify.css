@@ -1,0 +1,388 @@
+/* ==========================================================================
+   Gamification layer: motion, feedback and juice on top of index.css
+   ========================================================================== */
+
+/* --- Shared utilities ---------------------------------------------------- */
+
+.confetti-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 50;
+}
+
+.sound-toggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 60;
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.18);
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.sound-toggle:hover { transform: translateY(-2px); }
+.sound-toggle:active {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+/* Animated background: slow drifting glow behind every game screen. */
+.game-bg {
+  position: relative;
+  overflow: hidden;
+}
+.game-bg::before,
+.game-bg::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.35;
+  pointer-events: none;
+  z-index: 0;
+}
+.game-bg::before {
+  width: 55vw;
+  height: 55vw;
+  background: rgba(255, 255, 255, 0.75);
+  top: -18vw;
+  left: -12vw;
+  animation: drift 18s ease-in-out infinite;
+}
+.game-bg::after {
+  width: 45vw;
+  height: 45vw;
+  background: rgba(255, 180, 0, 0.55);
+  bottom: -16vw;
+  right: -10vw;
+  animation: drift 22s ease-in-out infinite reverse;
+}
+.game-bg > * { position: relative; z-index: 1; }
+
+@keyframes drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%      { transform: translate(6vw, 4vh) scale(1.15); }
+}
+
+/* --- Lobby --------------------------------------------------------------- */
+
+.pin-display.pin-pop {
+  animation: pinPulse 2.6s ease-in-out infinite;
+}
+@keyframes pinPulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+  50%      { transform: scale(1.03); box-shadow: 0 16px 40px rgba(0,0,0,0.28); }
+}
+
+.player-badge {
+  animation: badgeIn 0.45s cubic-bezier(0.18, 1.5, 0.4, 1) both;
+}
+@keyframes badgeIn {
+  0%   { transform: scale(0.2) rotate(-12deg); opacity: 0; }
+  60%  { transform: scale(1.15) rotate(4deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+
+.player-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.35);
+  padding: 8px 22px;
+  border-radius: 999px;
+  font-weight: 800;
+}
+.player-count.bump { animation: countBump 0.4s ease; }
+@keyframes countBump {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
+
+.btn-primary.btn-glow {
+  position: relative;
+  animation: btnGlow 1.8s ease-in-out infinite;
+}
+@keyframes btnGlow {
+  0%, 100% { box-shadow: 0 6px 0 #111, 0 0 0 0 rgba(255, 255, 255, 0.55); }
+  50%      { box-shadow: 0 6px 0 #111, 0 0 0 16px rgba(255, 255, 255, 0); }
+}
+
+/* --- Question preview ---------------------------------------------------- */
+
+.preview-question {
+  animation: dropIn 0.55s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+@keyframes dropIn {
+  0%   { transform: translateY(-60px) scale(0.9); opacity: 0; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.preview-count {
+  display: inline-block;
+  font-variant-numeric: tabular-nums;
+  animation: countdownPop 0.9s ease-out;
+}
+@keyframes countdownPop {
+  0%   { transform: scale(2.4); opacity: 0; }
+  35%  { transform: scale(1); opacity: 1; }
+  100% { transform: scale(0.85); opacity: 0.85; }
+}
+
+.preview-dots {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  margin-top: 10px;
+}
+.preview-dots span {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.28);
+  animation: dotBounce 1.05s ease-in-out infinite;
+}
+.preview-dots span:nth-child(2) { animation-delay: 0.15s; }
+.preview-dots span:nth-child(3) { animation-delay: 0.3s; }
+@keyframes dotBounce {
+  0%, 100% { transform: translateY(0); opacity: 0.5; }
+  50%      { transform: translateY(-14px); opacity: 1; }
+}
+
+/* --- Live question ------------------------------------------------------- */
+
+.countdown-ring {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+}
+.countdown-ring svg { position: absolute; inset: 0; }
+.countdown-ring-progress { transition: stroke-dashoffset 0.95s linear, stroke 0.3s ease; }
+.countdown-ring-value {
+  position: relative;
+  font-size: 2rem;
+  font-weight: 800;
+  color: #333;
+  font-variant-numeric: tabular-nums;
+}
+.countdown-ring.urgent { animation: ringShake 0.6s ease-in-out infinite; }
+.countdown-ring.urgent .countdown-ring-value { color: #e21b3c; }
+@keyframes ringShake {
+  0%, 100% { transform: translateX(0) scale(1); }
+  25%      { transform: translateX(-3px) scale(1.06); }
+  75%      { transform: translateX(3px) scale(1.06); }
+}
+
+.answer-counter {
+  transition: transform 0.2s ease;
+}
+.answer-counter.bump { animation: countBump 0.35s ease; }
+
+.question-headline {
+  animation: dropIn 0.45s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+
+.choice-anim {
+  animation: choiceIn 0.5s cubic-bezier(0.2, 1.3, 0.4, 1) both;
+}
+@keyframes choiceIn {
+  0%   { transform: translateY(40px) scale(0.85); opacity: 0; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+/* --- Results ------------------------------------------------------------- */
+
+.poll-bar {
+  transition: height 1s cubic-bezier(0.2, 1.1, 0.3, 1), opacity 0.4s ease;
+}
+.poll-bar.correct { animation: barGlow 1.4s ease-in-out infinite; }
+@keyframes barGlow {
+  0%, 100% { box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+  50%      { box-shadow: 0 2px 26px rgba(38, 137, 12, 0.9); }
+}
+
+.choice-correct {
+  animation: correctPop 0.7s cubic-bezier(0.2, 1.5, 0.4, 1) both;
+}
+@keyframes correctPop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+.choice-wrong { animation: fadeDim 0.6s ease both; }
+@keyframes fadeDim {
+  0%   { opacity: 1; filter: grayscale(0); }
+  100% { opacity: 0.4; filter: grayscale(0.5); }
+}
+.check-mark { animation: stampIn 0.5s cubic-bezier(0.2, 1.6, 0.4, 1) both; }
+@keyframes stampIn {
+  0%   { transform: scale(2.5) rotate(-20deg); opacity: 0; }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+
+/* --- Leaderboard --------------------------------------------------------- */
+
+.lb-row {
+  transition: background 0.3s ease;
+}
+.lb-row.rank-anim {
+  animation: lbSlideIn 0.55s cubic-bezier(0.2, 1.3, 0.4, 1) both;
+}
+@keyframes lbSlideIn {
+  0%   { opacity: 0; transform: translateX(-60px) scale(0.94); }
+  100% { opacity: 1; transform: translateX(0) scale(1); }
+}
+.lb-row.is-leader {
+  animation: lbSlideIn 0.55s cubic-bezier(0.2, 1.3, 0.4, 1) both,
+             leaderShine 2.4s ease-in-out 0.6s infinite;
+}
+@keyframes leaderShine {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); }
+  50%      { box-shadow: 0 0 26px 4px rgba(255, 215, 0, 0.85); }
+}
+.medal { margin-right: 8px; }
+
+.rank-indicator.up   { animation: bounceUp 0.9s ease 2; }
+.rank-indicator.down { animation: bounceDown 0.9s ease 2; }
+
+/* --- Player: answer pads ------------------------------------------------- */
+
+.pad-btn {
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: choiceIn 0.45s cubic-bezier(0.2, 1.3, 0.4, 1) both;
+}
+.pad-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0) 60%);
+  opacity: 0;
+  transform: scale(0.2);
+}
+.pad-btn.tapped::after { animation: ripple 0.5s ease-out; }
+@keyframes ripple {
+  0%   { opacity: 0.9; transform: scale(0.2); }
+  100% { opacity: 0; transform: scale(2.2); }
+}
+.pad-symbol {
+  font-size: clamp(2rem, 9vw, 4rem);
+  color: rgba(255, 255, 255, 0.92);
+  text-shadow: 0 3px 0 rgba(0, 0, 0, 0.18);
+  pointer-events: none;
+}
+
+/* --- Player: feedback screens -------------------------------------------- */
+
+.feedback-icon {
+  font-size: 5.5rem;
+  line-height: 1;
+  display: block;
+  margin-bottom: 12px;
+}
+.feedback-correct .feedback-icon { animation: correctBurst 0.75s cubic-bezier(0.2, 1.6, 0.4, 1) both; }
+@keyframes correctBurst {
+  0%   { transform: scale(0) rotate(-45deg); opacity: 0; }
+  55%  { transform: scale(1.35) rotate(8deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+.feedback-wrong { animation: shake 0.55s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
+@keyframes shake {
+  10%, 90% { transform: translateX(-8px); }
+  20%, 80% { transform: translateX(9px); }
+  30%, 50%, 70% { transform: translateX(-12px); }
+  40%, 60% { transform: translateX(12px); }
+}
+
+.score-pop {
+  display: inline-block;
+  margin-top: 18px;
+  font-size: 3rem;
+  font-weight: 900;
+  animation: scoreFloat 1s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+@keyframes scoreFloat {
+  0%   { transform: translateY(30px) scale(0.4); opacity: 0; }
+  60%  { transform: translateY(-8px) scale(1.2); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.streak-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+  padding: 10px 22px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #ff8a00, #e21b3c);
+  color: #fff;
+  font-size: 1.3rem;
+  font-weight: 800;
+  box-shadow: 0 6px 18px rgba(226, 27, 60, 0.45);
+  animation: streakIn 0.6s cubic-bezier(0.2, 1.5, 0.4, 1) both, streakGlow 1.6s ease-in-out 0.6s infinite;
+}
+@keyframes streakIn {
+  0%   { transform: scale(0.3) rotate(-10deg); opacity: 0; }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+@keyframes streakGlow {
+  0%, 100% { box-shadow: 0 6px 18px rgba(226, 27, 60, 0.45); }
+  50%      { box-shadow: 0 6px 30px rgba(255, 138, 0, 0.85); }
+}
+
+.waiting-dots-inline::after {
+  content: '';
+  animation: dots 1.4s steps(4, end) infinite;
+}
+@keyframes dots {
+  0%   { content: ''; }
+  25%  { content: '.'; }
+  50%  { content: '..'; }
+  75%  { content: '...'; }
+}
+
+.rank-plate {
+  display: inline-block;
+  margin-top: 16px;
+  padding: 12px 28px;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.18);
+  font-size: 1.6rem;
+  font-weight: 800;
+  animation: dropIn 0.6s cubic-bezier(0.2, 1.4, 0.4, 1) 0.2s both;
+}
+
+.trophy {
+  font-size: 6rem;
+  display: block;
+  animation: trophyIn 0.9s cubic-bezier(0.2, 1.5, 0.4, 1) both, floatY 2.6s ease-in-out 0.9s infinite;
+}
+@keyframes trophyIn {
+  0%   { transform: scale(0) rotate(-30deg); opacity: 0; }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+@keyframes floatY {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-12px); }
+}
+
+/* Respect the OS reduced-motion setting: keep the feedback, drop the motion. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

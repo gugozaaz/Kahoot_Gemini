@@ -5,6 +5,7 @@ import CreatorView from './CreatorView';
 import HostView from './HostView';
 import PlayerView from './PlayerView';
 import './index.css';
+import './gamify.css';
 
 function App() {
   return (
